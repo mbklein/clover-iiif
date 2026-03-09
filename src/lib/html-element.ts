@@ -1,4 +1,4 @@
-import sanitizeHtml from "sanitize-html";
+import DOMPurify from "dompurify";
 
 function createMarkup(html: string) {
   return { __html: sanitizeHTML(html) };
@@ -18,24 +18,10 @@ function sanitizeAttributes(props: any, remove: string[]) {
 }
 
 function sanitizeHTML(html: string) {
-  return sanitizeHtml(html, {
-    allowedAttributes: {
-      a: ["href"],
-      img: ["alt", "src", "height", "width"],
-    },
-    allowedSchemes: ["http", "https", "mailto"],
-    allowedTags: [
-      "a",
-      "b",
-      "br",
-      "i",
-      "img",
-      "p",
-      "small",
-      "span",
-      "sub",
-      "sup",
-    ],
+  return DOMPurify.sanitize(html, {
+    ALLOWED_TAGS: ["a", "b", "br", "i", "img", "p", "small", "span", "sub", "sup"],
+    ALLOWED_ATTR: ["href", "alt", "src", "height", "width"],
+    ALLOWED_URI_REGEXP: /^(?:https?|mailto):/i,
   });
 }
 
