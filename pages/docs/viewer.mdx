@@ -1006,3 +1006,67 @@ export default function App() {
   );
 }
 ```
+
+---
+
+## Custom Layout
+
+By default, `<Viewer iiifContent="..." />` renders with a built-in layout. For full control over how sub-components are arranged, including reordering, wrapping, or omitting pieces, use the compound API.
+
+`Viewer.Root` acts as the context provider and manifest loader. Place sub-components as its children in any order you like.
+
+```jsx
+import Viewer from "@samvera/clover-iiif/viewer";
+
+<Viewer.Root iiifContent="https://...">
+  <Viewer.Header />
+  <Viewer.Painting />
+  <Viewer.Navigator />
+  <Viewer.InformationPanel />
+</Viewer.Root>
+```
+
+All props accepted by `<Viewer>` (`options`, `customDisplays`, `plugins`, `canvasIdCallback`, etc.) are passed to `Viewer.Root`. The only difference is that `Viewer.Root` requires children instead of rendering the built-in layout.
+
+### Sub-components
+
+| Component                 | Description                                             |
+| ------------------------- | ------------------------------------------------------- |
+| `Viewer.Root`             | Context provider and manifest loader.                   |
+| `Viewer.Header`           | Manifest label and collection navigation.               |
+| `Viewer.Painting`         | Active canvas — image (OpenSeadragon), video, or audio. |
+| `Viewer.Navigator`        | Canvas thumbnail navigation strip.                      |
+| `Viewer.InformationPanel` | About, annotations, and content search panel.           |
+
+Sub-components can be freely omitted. For example, rendering `Viewer.Root` with only `Viewer.Painting` gives a bare image/video viewer with no chrome.
+
+### Accessing viewer state
+
+To read viewer state from inside a custom layout (for example, to conditionally render the Navigator only when there is more than one canvas), use `useViewerState()`. It must be called from a component rendered _inside_ `Viewer.Root`.
+
+```jsx
+import Viewer, { useViewerState } from "@samvera/clover-iiif/viewer";
+
+function ViewerLayout() {
+  const { sequence } = useViewerState();
+
+  return (
+    <>
+      <Viewer.Header />
+      <Viewer.Painting />
+      <Viewer.InformationPanel />
+      {sequence[1].length > 1 && <Viewer.Navigator />}
+    </>
+  );
+}
+
+export default function App() {
+  return (
+    <Viewer.Root iiifContent="https://...">
+      <ViewerLayout />
+    </Viewer.Root>
+  );
+}
+```
+
+`useViewerDispatch()` is also exported and gives write access to the same context store used by plugins.

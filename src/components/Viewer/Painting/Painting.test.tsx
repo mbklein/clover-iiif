@@ -42,15 +42,8 @@ const pdfPainting: Array<LabeledIIIFExternalWebResource> = [
   },
 ];
 
-const defaultProps = {
-  activeCanvas:
-    "https://api.dc.library.northwestern.edu/api/v2/works/71153379-4283-43be-8b0f-4e7e3bfda275?as=iiif/canvas/access/1",
-  isMedia: false,
-  painting,
-  resources: [],
-  annotationResources: [],
-  visibleCanvases: [],
-};
+const defaultActiveCanvas =
+  "https://api.dc.library.northwestern.edu/api/v2/works/71153379-4283-43be-8b0f-4e7e3bfda275?as=iiif/canvas/access/1";
 
 // Mock child components
 vi.mock("src/components/Viewer/Player/Player");
@@ -89,20 +82,20 @@ describe("Painting component", () => {
   it("Bypasses the Placeholder toggle and image items as expected", async () => {
     await vault.loadManifest("", canvasWithPDFs);
 
-    const props = {
-      ...defaultProps,
-      activeCanvas:
-        "https://api.dc.library.northwestern.edu/api/v2/works/71153379-4283-43be-8b0f-4e7e3bfda275?as=iiif/canvas/access/2",
-    };
-
     render(
       <ViewerProvider
         initialState={{
           ...defaultState,
           vault,
+          activeCanvas:
+            "https://api.dc.library.northwestern.edu/api/v2/works/71153379-4283-43be-8b0f-4e7e3bfda275?as=iiif/canvas/access/2",
+          paintingResources: painting,
+          isAudioVideo: false,
+          annotationResources: [],
+          visibleCanvases: [],
         }}
       >
-        <Painting {...props} />
+        <Painting />
       </ViewerProvider>,
     );
     expect(screen.queryByTestId("placeholder-toggle")).toBeNull();
@@ -111,21 +104,20 @@ describe("Painting component", () => {
   it("displays the default Video viewer for Media files", async () => {
     await vault.loadManifest("", manifestVideo);
 
-    const props = {
-      ...defaultProps,
-      activeCanvas:
-        "https://api.dc.library.northwestern.edu/api/v2/works/ec1a0e4f-d0e1-4bc3-9037-9d53e679522f?as=iiif/canvas/access/0",
-      isMedia: true,
-    };
-
     render(
       <ViewerProvider
         initialState={{
           ...defaultState,
           vault,
+          activeCanvas:
+            "https://api.dc.library.northwestern.edu/api/v2/works/ec1a0e4f-d0e1-4bc3-9037-9d53e679522f?as=iiif/canvas/access/0",
+          paintingResources: painting,
+          isAudioVideo: true,
+          annotationResources: [],
+          visibleCanvases: [],
         }}
       >
-        <Painting {...props} />
+        <Painting />
       </ViewerProvider>,
     );
 
@@ -138,20 +130,20 @@ describe("Painting component", () => {
   it("displays the default Image viewer for non-media files", async () => {
     await vault.loadManifest("", manifestImage);
 
-    const props = {
-      ...defaultProps,
-      activeCanvas:
-        "https://api.dc.library.northwestern.edu/api/v2/works/71153379-4283-43be-8b0f-4e7e3bfda275?as=iiif/canvas/access/2",
-    };
-
     render(
       <ViewerProvider
         initialState={{
           ...defaultState,
           vault,
+          activeCanvas:
+            "https://api.dc.library.northwestern.edu/api/v2/works/71153379-4283-43be-8b0f-4e7e3bfda275?as=iiif/canvas/access/2",
+          paintingResources: painting,
+          isAudioVideo: false,
+          annotationResources: [],
+          visibleCanvases: [],
         }}
       >
-        <Painting {...props} />
+        <Painting />
       </ViewerProvider>,
     );
 
@@ -161,7 +153,7 @@ describe("Painting component", () => {
   });
 
   it.skip("renders the Choice select dropdown", () => {
-    render(<Painting {...defaultProps} />);
+    render(<Painting />);
     expect(screen.queryByTestId("choice-select")).toBeNull();
   });
 
@@ -179,21 +171,20 @@ describe("Painting component", () => {
     const firstCanvas = manifestMixedChoices.items[0];
     const firstPainting = //@ts-ignore
       firstCanvas.items[0].items[0].body.items as IIIFExternalWebResource[];
-    const props = {
-      ...defaultProps,
-      isMedia: true,
-      painting: firstPainting,
-      activeCanvas: firstCanvas.id,
-    };
 
     const { rerender } = render(
       <ViewerProvider
         initialState={{
           ...defaultState,
           vault,
+          activeCanvas: firstCanvas.id,
+          paintingResources: firstPainting,
+          isAudioVideo: true,
+          annotationResources: [],
+          visibleCanvases: [],
         }}
       >
-        <Painting {...props} />
+        <Painting />
       </ViewerProvider>,
     );
 
@@ -221,21 +212,19 @@ describe("Painting component", () => {
     const secondPainting = secondCanvas.items[0].items[0]
       .body as IIIFExternalWebResource;
 
-    const newProps = {
-      ...defaultProps,
-      painting: [secondPainting],
-      isMedia: true,
-      activeCanvas: secondCanvas.id,
-    };
-
     rerender(
       <ViewerProvider
         initialState={{
           ...defaultState,
           vault,
+          activeCanvas: secondCanvas.id,
+          paintingResources: [secondPainting],
+          isAudioVideo: true,
+          annotationResources: [],
+          visibleCanvases: [],
         }}
       >
-        <Painting {...newProps} />
+        <Painting />
       </ViewerProvider>,
     );
   });
@@ -268,12 +257,6 @@ describe("Painting Custom Display component", () => {
       "https://api.dc.library.northwestern.edu/api/v2/works/71153379-4283-43be-8b0f-4e7e3bfda275?as=iiif/canvas/access/1",
     ];
 
-    const props = {
-      ...defaultProps,
-      painting: pdfPainting,
-      activeCanvas: canvasId[0],
-    };
-
     const customDisplay = {
       display: {
         component: MyComponent,
@@ -288,10 +271,15 @@ describe("Painting Custom Display component", () => {
         initialState={{
           ...defaultState,
           vault,
+          activeCanvas: canvasId[0],
+          paintingResources: pdfPainting,
+          isAudioVideo: false,
+          annotationResources: [],
+          visibleCanvases: [],
           customDisplays: [customDisplay],
         }}
       >
-        <Painting {...props} />
+        <Painting />
       </ViewerProvider>,
     );
 
@@ -300,9 +288,7 @@ describe("Painting Custom Display component", () => {
     // Passes the canvasId and annotationBody to the custom component
     const annotationBodyText = screen.getByTestId("annotationBody").textContent;
     expect(screen.getByTestId("id")).toHaveTextContent(canvasId[0]);
-    expect(JSON.parse(annotationBodyText || "")).toMatchObject(
-      props.painting[0],
-    );
+    expect(JSON.parse(annotationBodyText || "")).toMatchObject(pdfPainting[0]);
 
     expect(screen.queryByTestId("mock-image-viewer")).toBeNull();
 
@@ -314,10 +300,15 @@ describe("Painting Custom Display component", () => {
         initialState={{
           ...defaultState,
           vault,
+          activeCanvas: canvasId[0],
+          paintingResources: pdfPainting,
+          isAudioVideo: false,
+          annotationResources: [],
+          visibleCanvases: [],
           customDisplays: [customDisplay],
         }}
       >
-        <Painting {...props} />
+        <Painting />
       </ViewerProvider>,
     );
     expect(screen.queryByTestId("custom-display")).toBeNull();
@@ -328,12 +319,6 @@ describe("Painting Custom Display component", () => {
     await vault.loadManifest("", customDisplayManifest);
     const canvasId =
       "https://api.dc.library.northwestern.edu/api/v2/works/71153379-4283-43be-8b0f-4e7e3bfda275?as=iiif/canvas/access/0";
-
-    const props = {
-      ...defaultProps,
-      painting: pdfPainting,
-      activeCanvas: canvasId,
-    };
 
     const customDisplay = {
       display: {
@@ -351,10 +336,15 @@ describe("Painting Custom Display component", () => {
         initialState={{
           ...defaultState,
           vault,
+          activeCanvas: canvasId,
+          paintingResources: pdfPainting,
+          isAudioVideo: false,
+          annotationResources: [],
+          visibleCanvases: [],
           customDisplays: [customDisplay],
         }}
       >
-        <Painting {...props} />
+        <Painting />
       </ViewerProvider>,
     );
 
@@ -369,10 +359,15 @@ describe("Painting Custom Display component", () => {
         initialState={{
           ...defaultState,
           vault,
+          activeCanvas: canvasId,
+          paintingResources: pdfPainting,
+          isAudioVideo: false,
+          annotationResources: [],
+          visibleCanvases: [],
           customDisplays: [customDisplay],
         }}
       >
-        <Painting {...props} />
+        <Painting />
       </ViewerProvider>,
     );
     expect(screen.queryByTestId("custom-display")).toBeNull();
@@ -385,12 +380,6 @@ describe("Painting Custom Display component", () => {
       "https://api.dc.library.northwestern.edu/api/v2/works/71153379-4283-43be-8b0f-4e7e3bfda275?as=iiif/canvas/access/0",
       "https://api.dc.library.northwestern.edu/api/v2/works/71153379-4283-43be-8b0f-4e7e3bfda275?as=iiif/canvas/access/1",
     ];
-
-    const props = {
-      ...defaultProps,
-      painting: pdfPainting,
-      activeCanvas: canvasId[0],
-    };
 
     const customDisplay = {
       display: {
@@ -409,16 +398,21 @@ describe("Painting Custom Display component", () => {
         initialState={{
           ...defaultState,
           vault,
+          activeCanvas: canvasId[0],
+          paintingResources: pdfPainting,
+          isAudioVideo: false,
+          annotationResources: [],
+          visibleCanvases: [],
           customDisplays: [customDisplay],
         }}
       >
-        <Painting {...props} />
+        <Painting />
       </ViewerProvider>,
     );
 
     expect(screen.getByTestId("custom-display")).toBeInTheDocument();
 
-    // Rerender with a canvas ids not matching the activeCanvas
+    // Rerender with canvas ids not matching the activeCanvas
     customDisplay.target.canvasId = ["foo", "bar"];
 
     rerender(
@@ -426,10 +420,15 @@ describe("Painting Custom Display component", () => {
         initialState={{
           ...defaultState,
           vault,
+          activeCanvas: canvasId[0],
+          paintingResources: pdfPainting,
+          isAudioVideo: false,
+          annotationResources: [],
+          visibleCanvases: [],
           customDisplays: [customDisplay],
         }}
       >
-        <Painting {...props} />
+        <Painting />
       </ViewerProvider>,
     );
     expect(screen.getByTestId("custom-display")).toBeInTheDocument();
@@ -443,10 +442,15 @@ describe("Painting Custom Display component", () => {
         initialState={{
           ...defaultState,
           vault,
+          activeCanvas: canvasId[0],
+          paintingResources: pdfPainting,
+          isAudioVideo: false,
+          annotationResources: [],
+          visibleCanvases: [],
           customDisplays: [customDisplay],
         }}
       >
-        <Painting {...props} />
+        <Painting />
       </ViewerProvider>,
     );
 
@@ -460,12 +464,6 @@ describe("Painting Custom Display component", () => {
       "https://api.dc.library.northwestern.edu/api/v2/works/71153379-4283-43be-8b0f-4e7e3bfda275?as=iiif/canvas/access/0",
       "https://api.dc.library.northwestern.edu/api/v2/works/71153379-4283-43be-8b0f-4e7e3bfda275?as=iiif/canvas/access/1",
     ];
-
-    const props = {
-      ...defaultProps,
-      painting: pdfPainting,
-      activeCanvas: canvasId[0],
-    };
 
     const customDisplay = {
       display: {
@@ -484,10 +482,15 @@ describe("Painting Custom Display component", () => {
         initialState={{
           ...defaultState,
           vault,
+          activeCanvas: canvasId[0],
+          paintingResources: pdfPainting,
+          isAudioVideo: false,
+          annotationResources: [],
+          visibleCanvases: [],
           customDisplays: [customDisplay],
         }}
       >
-        <Painting {...props} />
+        <Painting />
       </ViewerProvider>,
     );
 

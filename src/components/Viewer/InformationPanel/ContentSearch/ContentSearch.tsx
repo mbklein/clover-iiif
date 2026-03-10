@@ -1,9 +1,10 @@
-import {
-  AnnotationNormalized,
-  AnnotationPageNormalized,
-} from "@iiif/presentation-3";
+import { AnnotationNormalized } from "@iiif/presentation-3";
 import React, { useEffect, useState } from "react";
-import { ViewerContextStore, useViewerState } from "src/context/viewer-context";
+import {
+  ViewerContextStore,
+  useViewerDispatch,
+  useViewerState,
+} from "src/context/viewer-context";
 
 import AnnotationItem from "../Annotation/Item";
 import { AnnotationResource } from "src/types/annotations";
@@ -15,19 +16,16 @@ import { useCloverTranslation } from "src/i18n/useCloverTranslation";
 
 type ContentSearchProps = {
   searchServiceUrl?: string;
-  setContentSearchResource: React.Dispatch<
-    React.SetStateAction<AnnotationPageNormalized | undefined>
-  >;
   activeCanvas: string;
   annotationPage: AnnotationResource;
 };
 
 const ContentSearch: React.FC<ContentSearchProps> = ({
   searchServiceUrl,
-  setContentSearchResource,
   activeCanvas,
   annotationPage,
 }) => {
+  const dispatch: any = useViewerDispatch();
   const viewerState: ViewerContextStore = useViewerState();
   const { vault } = viewerState;
 
@@ -62,9 +60,9 @@ const ContentSearch: React.FC<ContentSearchProps> = ({
     <>
       <ContentSearchForm
         searchServiceUrl={searchServiceUrl}
-        setContentSearchResource={setContentSearchResource}
         activeCanvas={activeCanvas}
         setLoading={setLoading}
+        dispatch={dispatch}
       />
       {loading ? (
         <span>{t("contentSearchLoading")}</span>

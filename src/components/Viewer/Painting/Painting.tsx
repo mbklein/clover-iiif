@@ -1,6 +1,5 @@
 import {
   Annotation,
-  AnnotationPageNormalized,
   CanvasNormalized,
   InternationalString,
 } from "@iiif/presentation-3";
@@ -9,7 +8,6 @@ import React, { useEffect } from "react";
 import { Select, SelectOption } from "src/components/UI/Select";
 import { useViewerDispatch, useViewerState } from "src/context/viewer-context";
 
-import { AnnotationResources } from "src/types/annotations";
 import ImageViewer from "src/components/Image";
 import { LabeledIIIFExternalWebResource } from "src/types/presentation-3";
 import PaintingPlaceholder from "./Placeholder";
@@ -18,21 +16,7 @@ import Toggle from "./Toggle";
 import { getPaintingResource } from "src/hooks/use-iiif";
 import { hashCode } from "src/lib/utils";
 
-interface PaintingProps {
-  activeCanvas: string;
-  annotationResources: AnnotationResources;
-  contentSearchResource?: AnnotationPageNormalized;
-  isMedia: boolean;
-  painting: LabeledIIIFExternalWebResource[];
-}
-
-const Painting: React.FC<PaintingProps> = ({
-  activeCanvas,
-  annotationResources,
-  contentSearchResource,
-  isMedia,
-  painting,
-}) => {
+const Painting: React.FC = () => {
   const [annotationIndex, setAnnotationIndex] = React.useState<number>(0);
   const [isInteractive, setIsInteractive] = React.useState(false);
   const [imageBody, setImageBody] = React.useState<
@@ -43,12 +27,17 @@ const Painting: React.FC<PaintingProps> = ({
   >([]);
   const [toggleCount, setToggleCount] = React.useState(0);
   const {
+    activeCanvas,
+    annotationResources,
     configOptions,
+    contentSearchResource,
     customDisplays,
     contentStateAnnotation,
     informationPanelResource,
+    isAudioVideo: isMedia,
     isPaged,
     openSeadragonViewer,
+    paintingResources: painting_,
     vault,
     viewerId,
     viewingDirection,
@@ -71,6 +60,9 @@ const Painting: React.FC<PaintingProps> = ({
     Boolean(contentStateAnnotation) &&
     // @ts-ignore
     Boolean(activeCanvas === contentStateAnnotation?.target?.source?.id);
+
+  // paintingResources from context is IIIFExternalWebResource[]; cast to LabeledIIIFExternalWebResource[]
+  const painting = painting_ as LabeledIIIFExternalWebResource[];
 
   const dispatch: any = useViewerDispatch();
   const normalizedCanvas: CanvasNormalized = vault.get(activeCanvas);

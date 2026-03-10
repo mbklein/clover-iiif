@@ -43,6 +43,7 @@ const Aside = styled("aside", {
   flexShrink: "0",
   width: "0",
   maxHeight: "100%",
+  overflow: "hidden",
 
   "&[data-aside-active='true']": {
     width: "38.2%",

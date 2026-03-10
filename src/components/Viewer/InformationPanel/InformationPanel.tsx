@@ -15,11 +15,10 @@ import {
 
 import AnnotationPage from "src/components/Viewer/InformationPanel/Annotation/Page";
 import ContentSearch from "src/components/Viewer/InformationPanel/ContentSearch/ContentSearch";
-import { AnnotationResources, AnnotationResource } from "src/types/annotations";
+import { AnnotationResources } from "src/types/annotations";
 import Information from "src/components/Viewer/InformationPanel/About/About";
 import {
   InternationalString,
-  AnnotationPageNormalized,
   CanvasNormalized,
   AnnotationNormalized,
 } from "@iiif/presentation-3";
@@ -34,31 +33,19 @@ import { annotationMatchesMotivations } from "src/lib/annotation-helpers";
 
 const UserScrollTimeout = 1500; // 1500ms without a user-generated scroll event reverts to auto-scrolling
 
-interface NavigatorProps {
-  activeCanvas: string;
-  annotationResources?: AnnotationResources;
-  searchServiceUrl?: string;
-  setContentSearchResource: React.Dispatch<
-    React.SetStateAction<AnnotationPageNormalized | undefined>
-  >;
-  contentSearchResource?: AnnotationResource;
-}
-
-export const InformationPanel: React.FC<NavigatorProps> = ({
-  activeCanvas,
-  annotationResources,
-  searchServiceUrl,
-  setContentSearchResource,
-  contentSearchResource,
-}) => {
+export const InformationPanel: React.FC = () => {
   const { t } = useCloverTranslation();
   const dispatch: any = useViewerDispatch();
   const viewerState: ViewerContextStore = useViewerState();
   const {
+    activeCanvas,
+    annotationResources,
+    contentSearchResource,
     contentStateAnnotation,
     informationPanelResource,
     isAutoScrolling,
     isUserScrolling,
+    searchServiceUrl,
     vault,
     configOptions,
     plugins,
@@ -84,8 +71,7 @@ export const InformationPanel: React.FC<NavigatorProps> = ({
     contentStateAnnotationSource.id === activeCanvas;
   const filteredAnnotationResources = useMemo(() => {
     if (!annotationResources) return [];
-    if (!allowedAnnotationMotivations)
-      return annotationResources;
+    if (!allowedAnnotationMotivations) return annotationResources;
 
     return annotationResources
       .map((annotationPage) => {
@@ -167,22 +153,27 @@ export const InformationPanel: React.FC<NavigatorProps> = ({
         type: "updateInformationPanelResource",
         informationPanelResource: "manifest-annotations",
       });
+    } else if (!renderAbout && renderAnnotation) {
+      dispatch({
+        type: "updateInformationPanelResource",
+        informationPanelResource: "manifest-annotations",
+      });
     } else {
       dispatch({
         type: "updateInformationPanelResource",
         informationPanelResource: "manifest-about",
       });
     }
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (!hasAnnotations) {
+    if (!hasAnnotations && informationPanel?.renderAbout) {
       dispatch({
         type: "updateInformationPanelResource",
         informationPanelResource: "manifest-about",
       });
     }
-  }, [hasAnnotations]);
+  }, [dispatch, hasAnnotations, informationPanel?.renderAbout]);
 
   function handleScroll() {
     if (!isAutoScrolling) {
@@ -267,7 +258,6 @@ export const InformationPanel: React.FC<NavigatorProps> = ({
           <Content value="manifest-content-search">
             <ContentSearch
               searchServiceUrl={searchServiceUrl}
-              setContentSearchResource={setContentSearchResource}
               activeCanvas={activeCanvas}
               annotationPage={contentSearchResource}
             />

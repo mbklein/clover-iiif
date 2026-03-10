@@ -1,9 +1,12 @@
 import {
   AnnotationNormalized,
   CollectionNormalized,
+  IIIFExternalWebResource,
   InternationalString,
+  ManifestNormalized,
   Reference,
 } from "@iiif/presentation-3";
+import { AnnotationResource, AnnotationResources } from "src/types/annotations";
 import OpenSeadragon, { Options as OpenSeadragonOptions } from "openseadragon";
 import React, { MediaHTMLAttributes, useEffect, useReducer } from "react";
 
@@ -201,12 +204,18 @@ export interface ViewerContextStore {
   customDisplays: Array<CustomDisplay>;
   plugins: Array<PluginConfig>;
   informationPanelResource?: string;
+  isAudioVideo: boolean;
   isAutoScrollEnabled?: boolean;
   isAutoScrolling?: boolean;
   isInformationOpen: boolean;
   isLoaded: boolean;
   isPaged: boolean;
   isUserScrolling?: number | undefined;
+  manifest?: ManifestNormalized;
+  paintingResources: IIIFExternalWebResource[];
+  annotationResources: AnnotationResources;
+  contentSearchResource?: AnnotationResource;
+  searchServiceUrl?: string;
   sequence: [Reference<"Canvas">[], number[][]];
   vault: Vault;
   viewingDirection: ViewingDirection;
@@ -225,13 +234,19 @@ export interface ViewerAction {
   configOptions: ViewerConfigOptions;
   contentStateAnnotation?: AnnotationNormalized;
   informationPanelResource?: string;
+  isAudioVideo: boolean;
   isAutoScrollEnabled: boolean;
   isAutoScrolling: boolean;
   isInformationOpen: boolean;
   isLoaded: boolean;
   isPaged: boolean;
   isUserScrolling: number | undefined;
+  manifest?: ManifestNormalized;
   manifestId: string;
+  paintingResources: IIIFExternalWebResource[];
+  annotationResources: AnnotationResources;
+  contentSearchResource?: AnnotationResource;
+  searchServiceUrl?: string;
   OSDImageLoaded?: boolean;
   player: HTMLVideoElement | HTMLAudioElement | null;
   sequence: [Reference<"Canvas">[], number[][]];
@@ -315,6 +330,7 @@ export const createDefaultState = (): ViewerContextStore => ({
   configOptions: cloneViewerConfigOptions(),
   customDisplays: [],
   plugins: [],
+  isAudioVideo: false,
   isAutoScrollEnabled: expandedAutoScrollOptions.enabled,
   isAutoScrolling: false,
   // Respect explicit false; default to true only when undefined
@@ -322,6 +338,11 @@ export const createDefaultState = (): ViewerContextStore => ({
   isLoaded: false,
   isPaged: false,
   isUserScrolling: undefined,
+  manifest: undefined,
+  paintingResources: [],
+  annotationResources: [],
+  contentSearchResource: undefined,
+  searchServiceUrl: undefined,
   sequence: [[], []],
   vault: new Vault(),
   viewingDirection: "left-to-right",
@@ -468,6 +489,37 @@ function viewerReducer(state: ViewerContextStore, action: ViewerAction) {
         isPaged: action.isPaged,
       };
     }
+    case "updateManifest": {
+      return {
+        ...state,
+        manifest: action.manifest,
+      };
+    }
+    case "updatePaintingResources": {
+      return {
+        ...state,
+        paintingResources: action.paintingResources ?? [],
+        isAudioVideo: action.isAudioVideo ?? false,
+      };
+    }
+    case "updateAnnotationResources": {
+      return {
+        ...state,
+        annotationResources: action.annotationResources ?? [],
+      };
+    }
+    case "updateContentSearchResource": {
+      return {
+        ...state,
+        contentSearchResource: action.contentSearchResource,
+      };
+    }
+    case "updateSearchServiceUrl": {
+      return {
+        ...state,
+        searchServiceUrl: action.searchServiceUrl,
+      };
+    }
     default: {
       throw new Error(`Unhandled action type: ${action.type}`);
     }
@@ -565,4 +617,11 @@ function useViewerDispatch() {
   return context;
 }
 
-export { ViewerProvider, useViewerState, useViewerDispatch };
+function useViewer() {
+  return {
+    state: useViewerState(),
+    dispatch: useViewerDispatch() as unknown as React.Dispatch<ViewerAction>,
+  };
+}
+
+export { ViewerProvider, useViewerState, useViewerDispatch, useViewer };

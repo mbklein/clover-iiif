@@ -1,10 +1,4 @@
 import {
-  AnnotationPageNormalized,
-  Canvas,
-  IIIFExternalWebResource,
-} from "@iiif/presentation-3";
-import { AnnotationResource, AnnotationResources } from "src/types/annotations";
-import {
   Aside,
   Content,
   Main,
@@ -17,30 +11,9 @@ import Painting from "../Painting/Painting";
 import React from "react";
 import { useViewerState } from "src/context/viewer-context";
 
-export interface ViewerContentProps {
-  activeCanvas: string;
-  annotationResources: AnnotationResources;
-  searchServiceUrl?: string;
-  setContentSearchResource: React.Dispatch<
-    React.SetStateAction<AnnotationPageNormalized | undefined>
-  >;
-  contentSearchResource?: AnnotationResource;
-  painting: IIIFExternalWebResource[];
-  items: Canvas[];
-  isAudioVideo: boolean;
-}
-
-const ViewerContent: React.FC<ViewerContentProps> = ({
-  activeCanvas,
-  annotationResources,
-  searchServiceUrl,
-  setContentSearchResource,
-  contentSearchResource,
-  isAudioVideo,
-  items,
-  painting,
-}) => {
+const ViewerContent: React.FC = () => {
   const {
+    annotationResources,
     contentStateAnnotation,
     isInformationOpen,
     configOptions,
@@ -79,29 +52,17 @@ const ViewerContent: React.FC<ViewerContentProps> = ({
       data-testid="clover-viewer-content"
     >
       <Main data-aside-active={isAside} data-aside-toggle={renderToggle}>
-        <Painting
-          activeCanvas={activeCanvas}
-          annotationResources={annotationResources}
-          contentSearchResource={contentSearchResource}
-          isMedia={isAudioVideo}
-          painting={painting}
-        />
+        <Painting />
 
         {sequence[1].length > 1 && (
           <MediaWrapper className="clover-viewer-media-wrapper">
-            <Media items={items} activeItem={0} />
+            <Media />
           </MediaWrapper>
         )}
       </Main>
       {isAside && (
         <Aside data-aside-active={isAside} data-aside-toggle={renderToggle}>
-          <InformationPanel
-            activeCanvas={activeCanvas}
-            annotationResources={annotationResources}
-            searchServiceUrl={searchServiceUrl}
-            setContentSearchResource={setContentSearchResource}
-            contentSearchResource={contentSearchResource}
-          />
+          <InformationPanel />
         </Aside>
       )}
     </Content>
