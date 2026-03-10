@@ -4,24 +4,20 @@ import { ButtonStyled, FormStyled } from "./ContentSearchForm.styled";
 import React, { useState } from "react";
 import { ViewerContextStore, useViewerState } from "src/context/viewer-context";
 
-import { AnnotationPageNormalized } from "@iiif/presentation-3";
-import { AnnotationResource } from "src/types/annotations";
 import { getContentSearchResources } from "src/hooks/use-iiif";
 import { useCloverTranslation } from "src/i18n/useCloverTranslation";
 
 type Props = {
   searchServiceUrl?: string;
-  setContentSearchResource: React.Dispatch<
-    React.SetStateAction<AnnotationResource | undefined>
-  >;
   activeCanvas: string;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  dispatch: (action: any) => void;
 };
 
 const SearchContent: React.FC<Props> = ({
   searchServiceUrl,
-  setContentSearchResource,
   setLoading,
+  dispatch,
 }) => {
   const { t } = useCloverTranslation();
   const [searchTerms, setSearchTerms] = useState<string | undefined>();
@@ -35,7 +31,7 @@ const SearchContent: React.FC<Props> = ({
     if (!openSeadragonViewer) return;
     if (!searchServiceUrl) return;
     if (!searchTerms || searchTerms.trim() === "") {
-      setContentSearchResource({} as unknown as AnnotationPageNormalized);
+      dispatch({ type: "updateContentSearchResource", contentSearchResource: {} });
       return;
     }
 
@@ -44,7 +40,7 @@ const SearchContent: React.FC<Props> = ({
     getContentSearchResources(vault, searchServiceUrl, {
       q: searchTerms,
     }).then((resources) => {
-      setContentSearchResource(resources);
+      dispatch({ type: "updateContentSearchResource", contentSearchResource: resources });
       setLoading(false);
     });
   }

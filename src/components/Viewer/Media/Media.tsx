@@ -23,16 +23,12 @@ import { getLabelAsString } from "src/lib/label-helpers";
 import { getResourceType } from "src/hooks/use-iiif/getResourceType";
 import { useCloverTranslation } from "src/i18n/useCloverTranslation";
 
-interface MediaProps {
-  items: Canvas[];
-  activeItem: number;
-}
-
-const Media: React.FC<MediaProps> = ({ items }) => {
+const Media: React.FC = () => {
   const { t } = useCloverTranslation();
   const dispatch: any = useViewerDispatch();
   const state: ViewerContextStore = useViewerState();
-  const { activeCanvas, isPaged, vault, sequence, viewingDirection } = state;
+  const { activeCanvas, isPaged, manifest, vault, sequence, viewingDirection } = state;
+  const items: Canvas[] = manifest?.items ?? [];
 
   /**
    * Determine if RTL paged navigation should be used
@@ -55,16 +51,14 @@ const Media: React.FC<MediaProps> = ({ items }) => {
   };
 
   useEffect(() => {
-    if (!mediaItems.length) {
-      const paintingType: ExternalResourceTypes[] = ["Image", "Sound", "Video"];
-      const entities: CanvasEntity[] = items
-        .map((item) =>
-          getCanvasByCriteria(vault, item, motivation, paintingType),
-        )
-        .filter((canvasEntity) => canvasEntity.annotations.length > 0);
-      setMediaItems(entities);
-    }
-  }, [items, mediaItems.length, vault]);
+    const paintingType: ExternalResourceTypes[] = ["Image", "Sound", "Video"];
+    const entities: CanvasEntity[] = items
+      .map((item) =>
+        getCanvasByCriteria(vault, item, motivation, paintingType),
+      )
+      .filter((canvasEntity) => canvasEntity.annotations.length > 0);
+    setMediaItems(entities);
+  }, [items, vault]);
 
   useEffect(() => {
     mediaItems.forEach((item, index) => {

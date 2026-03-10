@@ -1,7 +1,8 @@
 import { render, screen } from "@testing-library/react";
 
-import { Canvas } from "@iiif/presentation-3";
+import { Canvas, ManifestNormalized } from "@iiif/presentation-3";
 import Media from "src/components/Viewer/Media/Media";
+import { ViewerProvider, defaultState } from "src/context/viewer-context";
 import React from "react";
 
 const items = [
@@ -41,7 +42,20 @@ const items = [
 
 describe("Media component", () => {
   it("renders", () => {
-    render(<Media items={items} activeItem={0} />);
+    render(
+      <ViewerProvider
+        initialState={{
+          ...defaultState,
+          manifest: { items } as ManifestNormalized,
+          sequence: [
+            items.map((item) => ({ id: item.id, type: "Canvas" as const })),
+            [[0], [1]],
+          ],
+        }}
+      >
+        <Media />
+      </ViewerProvider>,
+    );
     const media = screen.getByTestId("media");
     expect(media);
     expect(media.hasAttribute("aria-label")).toBe(true);

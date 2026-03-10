@@ -14,9 +14,13 @@ vi.mock("src/components/Viewer/InformationPanel/About/About", () => ({
 vi.mock("src/context/viewer-context", () => ({
   useViewerDispatch: () => mockDispatch,
   useViewerState: () => ({
+    activeCanvas: "foobar",
+    annotationResources: [],
+    contentSearchResource: undefined,
     informationPanelResource: {},
     isAutoScrolling: false,
     isUserScrolling: false,
+    searchServiceUrl: undefined,
     vault: new Vault(),
     configOptions: {
       informationPanel: {
@@ -27,15 +31,9 @@ vi.mock("src/context/viewer-context", () => ({
   }),
 }));
 
-const props = {
-  activeCanvas: "foobar",
-  resources: [],
-  setContentSearchResource: () => {},
-};
-
 describe("InformationPanel", () => {
   test("renders an element with the 'clover-viewer-information-panel' class name", () => {
-    render(<InformationPanel {...props} />);
+    render(<InformationPanel />);
     expect(screen.getByTestId("information-panel")).toHaveClass(
       "clover-viewer-information-panel",
     );

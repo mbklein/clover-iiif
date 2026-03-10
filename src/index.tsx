@@ -2,7 +2,11 @@ import Image from "src/components/Image";
 import Primitives from "src/components/Primitives";
 import Scroll from "src/components/Scroll";
 import Slider from "src/components/Slider";
-import Viewer from "src/components/Viewer";
+import Viewer, {
+  useViewer,
+  useViewerState,
+  useViewerDispatch,
+} from "src/components/Viewer";
 import {
   parseAnnotationTarget,
   type AnnotationTargetExtended,
@@ -21,6 +25,9 @@ export {
   Scroll,
   Slider,
   Viewer,
+  useViewer,
+  useViewerState,
+  useViewerDispatch,
   helpers,
   type AnnotationTargetExtended,
   type Plugin,

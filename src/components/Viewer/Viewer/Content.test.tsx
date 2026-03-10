@@ -1,6 +1,4 @@
-import ViewerContent, {
-  ViewerContentProps,
-} from "src/components/Viewer/Viewer/Content";
+import ViewerContent from "src/components/Viewer/Viewer/Content";
 import { ViewerProvider, defaultState } from "src/context/viewer-context";
 import { render, screen } from "@testing-library/react";
 
@@ -50,18 +48,9 @@ const annotationResources: AnnotationResources = [
   },
 ];
 
-const props: ViewerContentProps = {
-  activeCanvas: "http://example.com/iiif/foobar/canvas/1",
-  painting: [],
-  annotationResources: [],
-  items: [],
-  isAudioVideo: false,
-  setContentSearchResource: () => {},
-};
-
 describe("ViewerContent", () => {
   test("renders an element with the 'clover-viewer-content' class name", () => {
-    render(<ViewerContent {...props} />);
+    render(<ViewerContent />);
     expect(screen.getByTestId("clover-viewer-content")).toHaveClass(
       "clover-viewer-content",
     );
@@ -76,7 +65,7 @@ describe("ViewerContent with no Annotation Resources", () => {
           ...defaultState,
         }}
       >
-        <ViewerContent {...props} />
+        <ViewerContent />
       </ViewerProvider>,
     );
     expect(screen.getByTestId("mock-information-panel"));
@@ -97,7 +86,7 @@ describe("ViewerContent with no Annotation Resources", () => {
           },
         }}
       >
-        <ViewerContent {...props} />
+        <ViewerContent />
       </ViewerProvider>,
     );
     expect(screen.queryByTestId("mock-information-panel")).toBeNull();
@@ -120,7 +109,7 @@ describe("ViewerContent with Annotation Resources", () => {
           },
         }}
       >
-        <ViewerContent {...props} />
+        <ViewerContent />
       </ViewerProvider>,
     );
     expect(screen.queryByTestId("mock-information-panel")).toBeNull();
@@ -141,7 +130,7 @@ describe("ViewerContent with Annotation Resources", () => {
           },
         }}
       >
-        <ViewerContent {...props} />
+        <ViewerContent />
       </ViewerProvider>,
     );
     expect(screen.queryByTestId("mock-information-panel")).toBeNull();
@@ -149,17 +138,13 @@ describe("ViewerContent with Annotation Resources", () => {
 });
 
 describe("ViewerContent with Annotation Resources", () => {
-  const propsWithAnnotationResources = {
-    ...props,
-    annotationResources,
-  };
-
   test("renders InformationPanel even if initial default configuration turns off InformationPanel", async () => {
     render(
       <ViewerProvider
         initialState={{
           ...defaultState,
           isInformationOpen: true,
+          annotationResources,
           configOptions: {
             informationPanel: {
               ...defaultState.configOptions.informationPanel,
@@ -170,7 +155,7 @@ describe("ViewerContent with Annotation Resources", () => {
           },
         }}
       >
-        <ViewerContent {...propsWithAnnotationResources} />
+        <ViewerContent />
       </ViewerProvider>,
     );
     expect(
@@ -184,6 +169,7 @@ describe("ViewerContent with Annotation Resources", () => {
         initialState={{
           ...defaultState,
           isInformationOpen: false,
+          annotationResources,
           configOptions: {
             informationPanel: {
               ...defaultState.configOptions.informationPanel,
@@ -195,7 +181,7 @@ describe("ViewerContent with Annotation Resources", () => {
           },
         }}
       >
-        <ViewerContent {...propsWithAnnotationResources} />
+        <ViewerContent />
       </ViewerProvider>,
     );
     expect(screen.queryByTestId("mock-information-panel")).toBeNull();
@@ -207,6 +193,7 @@ describe("ViewerContent with Annotation Resources", () => {
         initialState={{
           ...defaultState,
           isInformationOpen: true,
+          annotationResources,
           configOptions: {
             informationPanel: {
               ...defaultState.configOptions.informationPanel,
@@ -218,7 +205,7 @@ describe("ViewerContent with Annotation Resources", () => {
           },
         }}
       >
-        <ViewerContent {...propsWithAnnotationResources} />
+        <ViewerContent />
       </ViewerProvider>,
     );
     expect(screen.queryByTestId("mock-information-panel")).toBeNull();
